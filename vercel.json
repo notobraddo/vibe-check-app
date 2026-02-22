@@ -1,7 +1,4 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ],
   "headers": [
     {
       "source": "/.well-known/farcaster.json",
@@ -11,12 +8,3 @@
     }
   ]
 }
-```
-
-Struktur folder kamu sekarang:
-```
-vibe-check-app/
-├── index.html
-├── vercel.json
-└── .well-known/
-    └── farcaster.json
