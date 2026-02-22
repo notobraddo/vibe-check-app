@@ -1,0 +1,9 @@
+{
+  "miniapp": {
+    "version": "1",
+    "name": "VibeCheck",
+    "homeUrl": "https://NANTI-GANTI-DENGAN-URL-VERCEL.vercel.app",
+    "iconUrl": "https://NANTI-GANTI-DENGAN-URL-VERCEL.vercel.app/icon.png",
+    "description": "Daily vibe tracker for Farcaster"
+  }
+}
