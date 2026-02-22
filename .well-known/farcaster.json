@@ -1,9 +1,16 @@
 {
-  "miniapp": {
+  "frame": {
     "version": "1",
     "name": "VibeCheck",
     "homeUrl": "https://vibe-check-app-tan.vercel.app",
-    "iconUrl": "https://vibe-check-app-tan.vercel.app/icon.png",
-    "description": "Daily vibe tracker for Farcaster"
+    "iconUrl": "https://vibe-check-app-tan.vercel.app/icon.svg",
+    "imageUrl": "https://vibe-check-app-tan.vercel.app/icon.svg",
+    "splashImageUrl": "https://vibe-check-app-tan.vercel.app/icon.svg",
+    "splashBackgroundColor": "#0a0a0f",
+    "buttonTitle": "Check Vibe",
+    "subtitle": "Daily vibe tracker",
+    "description": "Check and share your daily vibe on Farcaster.",
+    "primaryCategory": "social",
+    "tagline": "What is your vibe today?"
   }
 }
