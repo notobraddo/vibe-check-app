@@ -1,4 +1,9 @@
 {
+  "accountAssociation": {
+    "header": "eyJmaWQiOjQyMzcxMywidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDhkNDViNjJkNDE1ZUVlNGM2M2RDOTIxMDFjNGIwRDk5MjczYUNhQTIifQ",
+    "payload": "eyJkb21haW4iOiJ2aWJlLWNoZWNrLWFwcC10YW4udmVyY2VsLmFwcCJ9",
+    "signature": "CitW0erA17c1pXjvOiYRTYzKQEfUgtvxwGWAzvmDlNN6yT3K5FsI7Z/4jLnLGXXZL5b8aWatBPVw2KbwDfkCjhs="
+  },
   "frame": {
     "version": "1",
     "name": "VibeCheck",
