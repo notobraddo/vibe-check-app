@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vibe Check — Farcaster Mini App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: #1e1e2e;
+      --accent: #7c3aed;
+      --accent2: #06b6d4;
+      --accent3: #f59e0b;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(124,58,237,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,58,237,0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideDown 0.5s ease both;
+    }
+
+    .logo {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(124,58,237,0.4);
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    h1 span { color: var(--accent2); }
+
+    .subtitle {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Status pill */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 8px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      animation: slideDown 0.5s 0.1s ease both;
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      animation: slideUp 0.5s ease both;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.15s; }
+    .card:nth-child(2) { animation-delay: 0.25s; }
+    .card:nth-child(3) { animation-delay: 0.35s; }
+
+    .card-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* User profile */
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      border: 2px solid var(--border);
+    }
+
+    .profile-info { flex: 1; }
+    .profile-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .profile-handle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .fid-badge {
+      font-size: 11px;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      color: #a78bfa;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+
+    /* Vibe meter */
+    .vibe-section { text-align: center; }
+
+    .vibe-emoji {
+      font-size: 56px;
+      display: block;
+      margin: 8px 0 12px;
+      filter: drop-shadow(0 0 16px rgba(245,158,11,0.5));
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .vibe-emoji:hover { transform: scale(1.15) rotate(-5deg); }
+
+    .vibe-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .vibe-desc { font-size: 12px; color: var(--muted); }
+
+    /* Progress bar */
+    .progress-wrap {
+      background: var(--border);
+      border-radius: 100px;
+      height: 6px;
+      margin: 16px 0 8px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 10px rgba(6,182,212,0.5);
+      transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Vibe options */
+    .vibe-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .vibe-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 4px;
+      font-size: 22px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .vibe-btn span {
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .vibe-btn:hover {
+      border-color: var(--accent);
+      background: rgba(124,58,237,0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(124,58,237,0.2);
+    }
+
+    .vibe-btn.active {
+      border-color: var(--accent2);
+      background: rgba(6,182,212,0.1);
+      box-shadow: 0 0 16px rgba(6,182,212,0.2);
+    }
+
+    /* Action buttons */
+    .actions { display: flex; gap: 10px; }
+
+    .btn {
+      flex: 1;
+      padding: 13px;
+      border-radius: 12px;
+      border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.03em;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #4f46e5);
+      color: white;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(124,58,237,0.5);
+    }
+
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover { border-color: var(--accent); color: #a78bfa; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--success);
+      color: #fff;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      padding: 12px 20px;
+      border-radius: 100px;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 100;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(16,185,129,0.4);
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* Stats row */
+    .stats-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .stat {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent2), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+
+    /* SDK info badge */
+    .sdk-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 12px;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      animation: slideUp 0.5s 0.45s ease both;
+    }
+
+    .sdk-info code {
+      background: rgba(124,58,237,0.15);
+      color: #a78bfa;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Skeleton loading */
+    .skeleton {
+      background: linear-gradient(90deg, var(--border) 25%, var(--surface) 50%, var(--border) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">🟣</div>
+    <div>
+      <h1>Vibe<span>Check</span></h1>
+      <div class="subtitle">Farcaster Mini App</div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <div class="dot"></div>
+    <span id="status-text">Connecting to Farcaster SDK…</span>
+  </div>
+
+  <!-- Profile Card -->
+  <div class="card" style="animation-delay:0.15s">
+    <div class="card-label">// connected user</div>
+    <div class="profile">
+      <div class="avatar" id="avatar">🟣</div>
+      <div class="profile-info">
+        <div class="profile-name" id="username">Loading…</div>
+        <div class="profile-handle" id="handle">@—</div>
+      </div>
+      <div class="fid-badge" id="fid-badge">FID —</div>
+    </div>
+    <div class="stats-row" style="margin-top:16px">
+      <div class="stat">
+        <div class="stat-val" id="stat-vibes">0</div>
+        <div class="stat-lbl">Vibes Cast</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="stat-streak">1</div>
+        <div class="stat-lbl">Day Streak</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="stat-level">1</div>
+        <div class="stat-lbl">Level</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vibe Meter -->
+  <div class="card" style="animation-delay:0.25s">
+    <div class="card-label">// today's vibe</div>
+    <div class="vibe-section">
+      <span class="vibe-emoji" id="main-emoji" title="Click to randomize!">😐</span>
+      <div class="vibe-label" id="vibe-label">Neutral</div>
+      <div class="vibe-desc" id="vibe-desc">Select your vibe below</div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="vibe-bar" style="width:50%"></div>
+      </div>
+      <div class="progress-meta">
+        <span>vibe intensity</span>
+        <span id="vibe-pct">50%</span>
+      </div>
+    </div>
+    <div class="vibe-grid" style="margin-top:16px" id="vibe-grid">
+      <!-- dynamically inserted -->
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="card" style="animation-delay:0.35s">
+    <div class="card-label">// actions</div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="castVibe()">🚀 Cast Vibe</button>
+      <button class="btn btn-secondary" onclick="shareApp()">⇧ Share App</button>
+    </div>
+  </div>
+
+  <!-- SDK Note -->
+  <div class="sdk-info">
+    <span>⚡</span>
+    <span>Powered by <code>@farcaster/miniapp-sdk</code> — call <code>sdk.actions.ready()</code> on load</span>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✓ Vibe cast to Farcaster!</div>
+
+<script type="module">
+  // ── Farcaster SDK Integration ──────────────────────────────────────────────
+  // In production, import from the real SDK:
+  //   import { sdk } from '@farcaster/miniapp-sdk'
+  //   OR via CDN:
+  //   import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
+
+  // For demo purposes, we simulate the SDK behaviour:
+  const sdk = {
+    actions: {
+      ready: async () => {
+        console.log('[SDK] ready() called — splash screen hidden');
+        // In real app this hides Farcaster's splash screen
+      },
+      openUrl: async (url) => {
+        console.log('[SDK] openUrl:', url);
+        window.open(url, '_blank');
+      },
+      composeCast: async ({ text, embeds }) => {
+        console.log('[SDK] composeCast:', { text, embeds });
+        showToast('🚀 Cast composer opened!');
+      },
+      close: async () => {
+        console.log('[SDK] close() called');
+      }
+    },
+    context: {
+      user: null // populated after init
+    }
+  };
+
+  // ── Vibe Data ─────────────────────────────────────────────────────────────
+  const VIBES = [
+    { emoji: '🔥', label: 'On Fire',     desc: 'You're absolutely crushing it.',        pct: 95, color: '#f97316' },
+    { emoji: '🚀', label: 'Launching',   desc: 'Big energy. Big moves. LFG.',           pct: 88, color: '#8b5cf6' },
+    { emoji: '😎', label: 'Smooth',      desc: 'Cool, calm, collected. As usual.',      pct: 75, color: '#06b6d4' },
+    { emoji: '🌊', label: 'Flowing',     desc: 'In the zone and riding the wave.',      pct: 70, color: '#3b82f6' },
+    { emoji: '😐', label: 'Neutral',     desc: 'Somewhere between meh and okay.',       pct: 50, color: '#94a3b8' },
+    { emoji: '☁️', label: 'Cloudy',     desc: 'Head in the clouds, vibes unclear.',    pct: 35, color: '#64748b' },
+    { emoji: '🫠', label: 'Melting',     desc: 'Send help. Or coffee. Or both.',        pct: 20, color: '#f59e0b' },
+    { emoji: '💀', label: 'Dead Inside', desc: 'Pure degen energy. We respect it.',     pct: 10, color: '#ef4444' },
+  ];
+
+  // ── State ─────────────────────────────────────────────────────────────────
+  let selectedVibe = VIBES[4]; // default neutral
+  let vibesCast    = parseInt(localStorage.getItem('vibesCast') || '0');
+  let streak       = parseInt(localStorage.getItem('streak') || '1');
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  async function init() {
+    // Simulate loading the SDK context
+    await new Promise(r => setTimeout(r, 900));
+
+    // In production you'd do: const ctx = await sdk.context
+    // Here we mock a user:
+    const mockUser = {
+      fid: 12345,
+      username: 'vibe_enjoyer',
+      displayName: 'Vibe Enjoyer',
+      pfp: null
+    };
+
+    sdk.context.user = mockUser;
+
+    // Update UI with user info
+    document.getElementById('username').textContent = mockUser.displayName;
+    document.getElementById('handle').textContent    = `@${mockUser.username}`;
+    document.getElementById('fid-badge').textContent = `FID ${mockUser.fid}`;
+    document.getElementById('avatar').textContent    = getInitialEmoji(mockUser.displayName);
+
+    document.getElementById('stat-vibes').textContent = vibesCast;
+    document.getElementById('stat-streak').textContent = streak;
+    document.getElementById('stat-level').textContent = Math.floor(vibesCast / 5) + 1;
+
+    document.getElementById('status-text').textContent = `Connected · @${mockUser.username}`;
+
+    // Build vibe grid
+    buildVibeGrid();
+
+    // CRITICAL: call ready() to hide splash screen
+    await sdk.actions.ready();
+
+    console.log('[App] Mini App fully loaded and ready!');
+  }
+
+  function getInitialEmoji(name) {
+    const emojis = ['🟣', '🔵', '🟡', '🟠', '🔴', '🟢'];
+    return emojis[name.length % emojis.length];
+  }
+
+  // ── Vibe Grid ─────────────────────────────────────────────────────────────
+  function buildVibeGrid() {
+    const grid = document.getElementById('vibe-grid');
+    grid.innerHTML = VIBES.map((v, i) => `
+      <button class="vibe-btn ${v === selectedVibe ? 'active' : ''}"
+              onclick="selectVibe(${i})"
+              title="${v.label}">
+        ${v.emoji}
+        <span>${v.label.split(' ')[0].substring(0,6)}</span>
+      </button>
+    `).join('');
+  }
+
+  // ── Select Vibe ───────────────────────────────────────────────────────────
+  window.selectVibe = function(index) {
+    selectedVibe = VIBES[index];
+
+    document.getElementById('main-emoji').textContent = selectedVibe.emoji;
+    document.getElementById('vibe-label').textContent = selectedVibe.label;
+    document.getElementById('vibe-desc').textContent  = selectedVibe.desc;
+    document.getElementById('vibe-bar').style.width   = selectedVibe.pct + '%';
+    document.getElementById('vibe-pct').textContent   = selectedVibe.pct + '%';
+    document.getElementById('vibe-bar').style.background =
+      `linear-gradient(90deg, ${selectedVibe.color}, var(--accent2))`;
+
+    // Emoji bounce animation
+    const emoji = document.getElementById('main-emoji');
+    emoji.style.transform = 'scale(1.4) rotate(10deg)';
+    setTimeout(() => emoji.style.transform = '', 300);
+
+    buildVibeGrid();
+  };
+
+  // ── Cast Vibe ─────────────────────────────────────────────────────────────
+  window.castVibe = async function() {
+    const text = `${selectedVibe.emoji} My vibe today: ${selectedVibe.label}\n"${selectedVibe.desc}"\n\nVibe check via @vibecheck mini app on Farcaster`;
+
+    // Uses Farcaster SDK to open cast composer
+    await sdk.actions.composeCast({
+      text,
+      embeds: ['https://vibecheck.example.com']
+    });
+
+    // Update stats
+    vibesCast++;
+    localStorage.setItem('vibesCast', vibesCast);
+    document.getElementById('stat-vibes').textContent = vibesCast;
+    document.getElementById('stat-level').textContent = Math.floor(vibesCast / 5) + 1;
+
+    showToast(`${selectedVibe.emoji} Vibe cast!`);
+  };
+
+  // ── Share App ─────────────────────────────────────────────────────────────
+  window.shareApp = async function() {
+    await sdk.actions.composeCast({
+      text: '🟣 Just discovered VibeCheck — a mini app on Farcaster for daily vibe tracking. Try it!',
+      embeds: ['https://vibecheck.example.com']
+    });
+  };
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // ── Randomize on emoji click ───────────────────────────────────────────────
+  document.getElementById('main-emoji').addEventListener('click', () => {
+    const random = Math.floor(Math.random() * VIBES.length);
+    selectVibe(random);
+  });
+
+  // ── Boot ──────────────────────────────────────────────────────────────────
+  init();
+</script>
+</body>
+</html>
