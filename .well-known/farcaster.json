@@ -2,8 +2,8 @@
   "miniapp": {
     "version": "1",
     "name": "VibeCheck",
-    "homeUrl": "https://vibe-check-34ruah7dm-notobraddos-projects.vercel.app",
-    "iconUrl": "https://vibe-check-34ruah7dm-notobraddos-projects.vercel.app/icon.png",
+    "homeUrl": "https://vibe-check-app-tan.vercel.app",
+    "iconUrl": "https://vibe-check-app-tan.vercel.app/icon.png",
     "description": "Daily vibe tracker for Farcaster"
   }
 }
